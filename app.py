@@ -1,15 +1,19 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_wtf import FlaskForm
-from wtforms import StringField, FloatField, SubmitField, SelectField, TextAreaField
+from wtforms import StringField, FloatField, SubmitField, SelectField, TextAreaField, PasswordField
 from wtforms.validators import DataRequired, Email, NumberRange
 from core import DriveSyncApp
 from models import Vehicle, Driver, Client, ClientRequest
 
 flask_app = Flask(__name__)
-flask_app.config['SECRET_KEY'] = 'your-secret-key'  # Replace with env variable in production
+flask_app.config['SECRET_KEY'] = 'your-secret-key'  # Replace in production
 logic = DriveSyncApp()
 
-# Predefined locations (latitude, longitude) for Uganda
+ADMIN_CREDENTIALS = {
+    'username': 'admin',
+    'password': 'admin123'
+}
+
 LOCATIONS = [
     ('Kampala', (0.3476, 32.5825)),
     ('Entebbe', (0.3163, 32.3892)),
@@ -21,7 +25,6 @@ LOCATIONS = [
     ('Mbale', (1.0784, 34.1750))
 ]
 
-# Custom Jinja2 filter for formatting numbers
 def format_number(value):
     try:
         return "{:,.0f}".format(float(value))
@@ -30,7 +33,9 @@ def format_number(value):
 
 flask_app.jinja_env.filters['format_number'] = format_number
 
-# WTForms for validation
+def is_admin_logged_in():
+    return session.get('admin_logged_in', False)
+
 class ClientForm(FlaskForm):
     account_id = StringField('Account ID', validators=[DataRequired()])
     name = StringField('Name', validators=[DataRequired()])
@@ -44,11 +49,7 @@ class DriverForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     contact = StringField('Contact', validators=[DataRequired()])
     vehicle_type = SelectField('Vehicle Type', choices=[
-        ('', 'Select Vehicle Type'),
-        ('Van', 'Van'),
-        ('Truck', 'Truck'),
-        ('Car', 'Car'),
-        ('Bus', 'Bus')
+        ('', 'Select Vehicle Type'), ('Van', 'Van'), ('Truck', 'Truck'), ('Car', 'Car'), ('Bus', 'Bus')
     ], validators=[DataRequired()])
     vehicle_reg_no = SelectField('Vehicle Registration Number', validators=[DataRequired()])
     driver_day_allowance = FloatField('Day Allowance (UGX)', validators=[DataRequired(), NumberRange(min=0)])
@@ -61,11 +62,7 @@ class DriverForm(FlaskForm):
 
 class VehicleForm(FlaskForm):
     vehicle_type = SelectField('Vehicle Type', choices=[
-        ('', 'Select Vehicle Type'),
-        ('Van', 'Van'),
-        ('Truck', 'Truck'),
-        ('Car', 'Car'),
-        ('Bus', 'Bus')
+        ('', 'Select Vehicle Type'), ('Van', 'Van'), ('Truck', 'Truck'), ('Car', 'Car'), ('Bus', 'Bus')
     ], validators=[DataRequired()])
     vehicle_reg_no = StringField('Vehicle Registration Number', validators=[DataRequired()])
     fuel_litres_per_km = FloatField('Fuel Litres per KM', validators=[DataRequired(), NumberRange(min=0)])
@@ -99,10 +96,39 @@ class ClientRequestForm(FlaskForm):
     comments = TextAreaField('Comments')
     submit = SubmitField('Submit Request')
 
-# Routes
+class LoginForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    submit = SubmitField('Login')
+
 @flask_app.route('/')
 def home():
-    return render_template('index.html', drivers=logic.drivers, clients=logic.clients, accounts=logic.list_all_accounts(), requests=logic.client_requests, trips=logic.trips)
+    if not is_admin_logged_in():
+        flash('Please log in as admin to access the dashboard.', 'error')
+        return redirect(url_for('login'))
+    return render_template('index.html', drivers=logic.drivers, clients=logic.clients, accounts=logic.list_all_accounts(), requests=logic.client_requests, trips=logic.trips, active_page='home')
+
+@flask_app.route('/login', methods=['GET', 'POST'])
+def login():
+    if is_admin_logged_in():
+        return redirect(url_for('home'))
+    form = LoginForm()
+    if form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
+        if username == ADMIN_CREDENTIALS['username'] and password == ADMIN_CREDENTIALS['password']:
+            session['admin_logged_in'] = True
+            flash('Admin login successful!', 'success')
+            return redirect(url_for('home'))
+        else:
+            flash('Invalid username or password.', 'error')
+    return render_template('login.html', form=form, active_page='login')
+
+@flask_app.route('/logout')
+def logout():
+    session.pop('admin_logged_in', None)
+    flash('You have been logged out.', 'success')
+    return redirect(url_for('login'))
 
 @flask_app.route('/create_account', methods=['GET', 'POST'])
 def create_account():
@@ -120,10 +146,13 @@ def create_account():
             return redirect(url_for('home'))
         except Exception as e:
             flash(f'Error creating account: {str(e)}', 'error')
-    return render_template('create_account.html', form=form)
+    return render_template('create_account.html', form=form, active_page='create_account')
 
 @flask_app.route('/add_driver', methods=['GET', 'POST'])
 def add_driver():
+    if not is_admin_logged_in():
+        flash('Please log in as admin to access this page.', 'error')
+        return redirect(url_for('login'))
     form = DriverForm(vehicles=logic.vehicles)
     if form.validate_on_submit():
         try:
@@ -147,10 +176,13 @@ def add_driver():
             return redirect(url_for('home'))
         except Exception as e:
             flash(f'Error adding driver: {str(e)}', 'error')
-    return render_template('add_driver.html', form=form)
+    return render_template('add_driver.html', form=form, active_page='add_driver')
 
 @flask_app.route('/add_vehicle', methods=['GET', 'POST'])
 def add_vehicle():
+    if not is_admin_logged_in():
+        flash('Please log in as admin to access this page.', 'error')
+        return redirect(url_for('login'))
     form = VehicleForm()
     if form.validate_on_submit():
         try:
@@ -165,10 +197,13 @@ def add_vehicle():
             return redirect(url_for('home'))
         except Exception as e:
             flash(f'Error adding vehicle: {str(e)}', 'error')
-    return render_template('add_vehicle.html', form=form)
+    return render_template('add_vehicle.html', form=form, active_page='add_vehicle')
 
 @flask_app.route('/process_trip', methods=['GET', 'POST'])
 def process_trip():
+    if not is_admin_logged_in():
+        flash('Please log in as admin to access this page.', 'error')
+        return redirect(url_for('login'))
     form = TripForm(clients=logic.clients, drivers=logic.drivers)
     if form.validate_on_submit():
         try:
@@ -186,7 +221,7 @@ def process_trip():
             
             if not (start_coords and end_coords):
                 flash('Please provide valid start and end locations.', 'error')
-                return render_template('process_trip.html', form=form)
+                return render_template('process_trip.html', form=form, active_page='process_trip')
 
             result = logic.process_trip(
                 client_id=form.client_id.data,
@@ -202,7 +237,7 @@ def process_trip():
             return redirect(url_for('home'))
         except Exception as e:
             flash(f'Error processing trip: {str(e)}', 'error')
-    return render_template('process_trip.html', form=form)
+    return render_template('process_trip.html', form=form, active_page='process_trip')
 
 @flask_app.route('/client_request', methods=['GET', 'POST'])
 def client_request():
@@ -219,16 +254,34 @@ def client_request():
                 goods_description=form.goods_description.data,
                 pick_up_point=pick_up_coords,
                 drop_off_point=drop_off_coords,
-                comments=form.comments.data
+                comments=form.comments.data,
+                client_id=None,
+                pick_up_name=form.pick_up_point.data,
+                drop_off_name=form.drop_off_point.data
             )
             client = logic.add_client_request(client_request)
+            client_request.client_id = client.account_id
             return render_template('confirmation.html', 
                                  request=client_request, 
                                  cost=client_request.estimated_cost,
-                                 client_name=client.name)
+                                 cost_breakdown=client_request.cost_breakdown,
+                                 client_name=client.name,
+                                 active_page='client_request')
         except Exception as e:
             flash(f'Error submitting request: {str(e)}', 'error')
-    return render_template('client_request.html', form=form)
+    return render_template('client_request.html', form=form, active_page='client_request')
+
+@flask_app.route('/history/<client_id>')
+def history(client_id):
+    if not is_admin_logged_in():
+        flash('Please log in as admin to access this page.', 'error')
+        return redirect(url_for('login'))
+    client = next((c for c in logic.clients if c.account_id == client_id), None)
+    if not client:
+        flash('Client not found.', 'error')
+        return redirect(url_for('home'))
+    trips = [trip for trip in logic.trips if trip.client_id == client_id]
+    return render_template('history.html', client=client, trips=trips, active_page='history')
 
 if __name__ == "__main__":
-    flask_app.run(debug=True)  # Set debug=False in production
+    flask_app.run(debug=True)
