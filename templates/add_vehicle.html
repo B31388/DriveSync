@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Vehicle{% endblock %}
+
+{% block content %}
+    <h1 class="mb-4">Add Vehicle</h1>
+    <div class="card">
+        <div class="card-body">
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                <div class="mb-3">
+                    {{ form.vehicle_type.label(class="form-label") }}
+                    {{ form.vehicle_type(class="form-select") }}
+                    {% if form.vehicle_type.errors %}
+                        <div class="text-danger">{{ form.vehicle_type.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    {{ form.vehicle_reg_no.label(class="form-label") }}
+                    {{ form.vehicle_reg_no(class="form-control") }}
+                    {% if form.vehicle_reg_no.errors %}
+                        <div class="text-danger">{{ form.vehicle_reg_no.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    {{ form.fuel_litres_per_km.label(class="form-label") }}
+                    {{ form.fuel_litres_per_km(class="form-control") }}
+                    {% if form.fuel_litres_per_km.errors %}
+                        <div class="text-danger">{{ form.fuel_litres_per_km.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    {{ form.daily_vehicle_charges.label(class="form-label") }}
+                    {{ form.daily_vehicle_charges(class="form-control") }}
+                    {% if form.daily_vehicle_charges.errors %}
+                        <div class="text-danger">{{ form.daily_vehicle_charges.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <button type="submit" class="btn btn-primary">{{ form.submit.label }}</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

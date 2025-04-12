@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}DriveSync Dashboard{% endblock %}
+
+{% block content %}
+    <h1 class="mb-4">DriveSync Dashboard</h1>
+    <p class="lead">Welcome! <a href="{{ url_for('client_request') }}">Request a trip</a> to book your transport.</p>
+
+    <!-- Client Requests -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2 class="h5 mb-0">Client Requests</h2>
+        </div>
+        <div class="card-body">
+            {% if requests %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Goods</th>
+                                <th>Pick-up</th>
+                                <th>Drop-off</th>
+                                <th>Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for request in requests %}
+                                <tr>
+                                    <td>{{ request.name }}</td>
+                                    <td>{{ request.email }}</td>
+                                    <td>{{ request.goods_description }}</td>
+                                    <td>{{ request.pick_up_point }}</td>
+                                    <td>{{ request.drop_off_point }}</td>
+                                    <td>UGX {{ request.estimated_cost|format_number }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted">No client requests available.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Processed Trips -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2 class="h5 mb-0">Processed Trips</h2>
+        </div>
+        <div class="card-body">
+            {% if trips %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Start</th>
+                                <th>End</th>
+                                <th>Distance</th>
+                                <th>Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for trip in trips %}
+                                <tr>
+                                    <td>{{ trip.start_location }}</td>
+                                    <td>{{ trip.end_location }}</td>
+                                    <td>{{ trip.distance|round(2) }} km</td>
+                                    <td>UGX {{ trip.total_cost|format_number }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted">No trips processed.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Accounts -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2 class="h5 mb-0">Accounts</h2>
+        </div>
+        <div class="card-body">
+            {% if accounts %}
+                <ul class="list-group list-group-flush">
+                    {% for account in accounts %}
+                        <li class="list-group-item">{{ account }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted">No accounts available.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Drivers -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2 class="h5 mb-0">Drivers</h2>
+        </div>
+        <div class="card-body">
+            {% if drivers %}
+                <ul class="list-group list-group-flush">
+                    {% for driver in drivers %}
+                        <li class="list-group-item">{{ driver.get_details() }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted">No drivers available.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Clients -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2 class="h5 mb-0">Clients</h2>
+        </div>
+        <div class="card-body">
+            {% if clients %}
+                <ul class="list-group list-group-flush">
+                    {% for client in clients %}
+                        <li class="list-group-item">{{ client.get_details() }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted">No clients available.</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

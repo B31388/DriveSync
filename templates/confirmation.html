@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}Request Confirmation{% endblock %}
+
+{% block content %}
+    <h1>Request Confirmation</h1>
+    <p>Thank you, {{ client_name }}! Your trip request has been submitted successfully.</p>
+    <h2>Request Details</h2>
+    <p>{{ request.get_details() }}</p>
+    <p><strong>Estimated Cost: UGX {{ cost|format_number }}</strong></p>
+    <p><a href="{{ url_for('home') }}">Return to Home</a></p>
+{% endblock %}

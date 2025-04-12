@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Assign Vehicle{% endblock %}
+{% block content %}
+    <h1>Assign Vehicle to Driver</h1>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <div class="mb-3">
+            {{ form.driver_id.label(class="form-label") }}
+            {{ form.driver_id(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.vehicle_reg_no.label(class="form-label") }}
+            <select class="form-control" name="{{ form.vehicle_reg_no.name }}">
+                {% for value, label in form.vehicle_reg_no.choices %}
+                    <option value="{{ value }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            {{ form.submit(class="btn btn-primary") }}
+        </div>
+    </form>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Set Fuel Cost{% endblock %}
+{% block content %}
+    <h1>Set Fuel Cost</h1>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <div class="mb-3">
+            {{ form.fuel_cost.label(class="form-label") }}
+            {{ form.fuel_cost(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.submit(class="btn btn-primary") }}
+        </div>
+    </form>
+{% endblock %}

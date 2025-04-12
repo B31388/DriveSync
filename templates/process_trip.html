@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}Process Trip{% endblock %}
+
+{% block content %}
+    <h1 class="mb-4">Process Trip</h1>
+    <div class="card">
+        <div class="card-body">
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                <div class="mb-3">
+                    {{ form.client_id.label(class="form-label") }}
+                    {{ form.client_id(class="form-select") }}
+                    {% if form.client_id.errors %}
+                        <div class="text-danger">{{ form.client_id.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    {{ form.driver_id.label(class="form-label") }}
+                    {{ form.driver_id(class="form-select") }}
+                    {% if form.driver_id.errors %}
+                        <div class="text-danger">{{ form.driver_id.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    {{ form.start_location.label(class="form-label") }}
+                    {{ form.start_location(class="form-select") }}
+                    {% if form.start_location.errors %}
+                        <div class="text-danger">{{ form.start_location.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    {{ form.start_location_lat.label(class="form-label") }}
+                    {{ form.start_location_lat(class="form-control") }}
+                    {% if form.start_location_lat.errors %}
+                        <div class="text-danger">{{ form.start_location_lat.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    {{ form.start_location_lon.label(class="form-label") }}
+                    {{ form.start_location_lon(class="form-control") }}
+                    {% if form.start_location_lon.errors %}
+                        <div class="text-danger">{{ form.start_location_lon.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    {{ form.end_location.label(class="form-label") }}
+                    {{ form.end_location(class="form-select") }}
+                    {% if form.end_location.errors %}
+                        <div class="text-danger">{{ form.end_location.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    {{ form.end_location_lat.label(class="form-label") }}
+                    {{ form.end_location_lat(class="form-control") }}
+                    {% if form.end_location_lat.errors %}
+                        <div class="text-danger">{{ form.end_location_lat.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    {{ form.end_location_lon.label(class="form-label") }}
+                    {{ form.end_location_lon(class="form-control") }}
+                    {% if form.end_location_lon.errors %}
+                        <div class="text-danger">{{ form.end_location_lon.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    {{ form.fuel_cost.label(class="form-label") }}
+                    {{ form.fuel_cost(class="form-control") }}
+                    {% if form.fuel_cost.errors %}
+                        <div class="text-danger">{{ form.fuel_cost.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <button type="submit" class="btn btn-primary">{{ form.submit.label }}</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

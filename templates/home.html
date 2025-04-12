@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head><title>DriveSync</title></head>
+<body>
+    <h1>DriveSync Dashboard</h1>
+    {% for message in get_flashed_messages(with_categories=true) %}
+        <p style="color: {{ 'green' if message[0] == 'success' else 'orange' if message[0] == 'warning' else 'red' }}">{{ message[1] }}</p>
+    {% endfor %}
+    <h2>Accounts</h2>
+    <ul>
+        {% for account in accounts %}
+            <li>{{ account }}</li>
+        {% endfor %}
+    </ul>
+    <p><a href="{{ url_for('create_account') }}">Create Client</a> | <a href="{{ url_for('add_driver') }}">Add Driver</a> | <a href="{{ url_for('add_vehicle') }}">Add Vehicle</a> | <a href="{{ url_for('process_trip') }}">Process Trip</a></p>
+</body>
+</html>

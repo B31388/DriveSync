@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Driver{% endblock %}
+
+{% block content %}
+    <h1 class="mb-4">Add Driver</h1>
+    <div class="card">
+        <div class="card-body">
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                <div class="mb-3">
+                    {{ form.account_id.label(class="form-label") }}
+                    {{ form.account_id(class="form-control") }}
+                    {% if form.account_id.errors %}
+                        <div class="text-danger">{{ form.account_id.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    {{ form.name.label(class="form-label") }}
+                    {{ form.name(class="form-control") }}
+                    {% if form.name.errors %}
+                        <div class="text-danger">{{ form.name.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    {{ form.email.label(class="form-label") }}
+                    {{ form.email(class="form-control") }}
+                    {% if form.email.errors %}
+                        <div class="text-danger">{{ form.email.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    {{ form.contact.label(class="form-label") }}
+                    {{ form.contact(class="form-control") }}
+                    {% if form.contact.errors %}
+                        <div class="text-danger">{{ form.contact.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    {{ form.vehicle_type.label(class="form-label") }}
+                    {{ form.vehicle_type(class="form-select") }}
+                    {% if form.vehicle_type.errors %}
+                        <div class="text-danger">{{ form.vehicle_type.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    {{ form.vehicle_reg_no.label(class="form-label") }}
+                    {{ form.vehicle_reg_no(class="form-select") }}
+                    {% if form.vehicle_reg_no.errors %}
+                        <div class="text-danger">{{ form.vehicle_reg_no.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    {{ form.driver_day_allowance.label(class="form-label") }}
+                    {{ form.driver_day_allowance(class="form-control") }}
+                    {% if form.driver_day_allowance.errors %}
+                        <div class="text-danger">{{ form.driver_day_allowance.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    {{ form.driver_night_allowance.label(class="form-label") }}
+                    {{ form.driver_night_allowance(class="form-control") }}
+                    {% if form.driver_night_allowance.errors %}
+                        <div class="text-danger">{{ form.driver_night_allowance.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <button type="submit" class="btn btn-primary">{{ form.submit.label }}</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

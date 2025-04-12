@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Client{% endblock %}
+
+{% block content %}
+    <h1 class="mb-4">Create Client Account</h1>
+    <div class="card">
+        <div class="card-body">
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                <div class="mb-3">
+                    {{ form.account_id.label(class="form-label") }}
+                    {{ form.account_id(class="form-control") }}
+                    {% if form.account_id.errors %}
+                        <div class="text-danger">{{ form.account_id.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    {{ form.name.label(class="form-label") }}
+                    {{ form.name(class="form-control") }}
+                    {% if form.name.errors %}
+                        <div class="text-danger">{{ form.name.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    {{ form.email.label(class="form-label") }}
+                    {{ form.email(class="form-control") }}
+                    {% if form.email.errors %}
+                        <div class="text-danger">{{ form.email.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    {{ form.contact.label(class="form-label") }}
+                    {{ form.contact(class="form-control") }}
+                    {% if form.contact.errors %}
+                        <div class="text-danger">{{ form.contact.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <button type="submit" class="btn btn-primary">{{ form.submit.label }}</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
