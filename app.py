@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from flask_wtf import FlaskForm
 from wtforms import StringField, FloatField, SubmitField, SelectField, TextAreaField, PasswordField
 from wtforms.validators import DataRequired, Email, NumberRange
+from wtforms import ValidationError
 from core import DriveSyncApp
 from models import Vehicle, Driver, Client, ClientRequest
 
@@ -85,6 +86,19 @@ class TripForm(FlaskForm):
         super(TripForm, self).__init__(*args, **kwargs)
         self.client_id.choices = [('', 'Select Client')] + [(c.account_id, f"{c.account_id} - {c.name}") for c in clients]
         self.driver_id.choices = [('', 'Select Driver')] + [(d.account_id, f"{d.account_id} - {d.name}") for d in drivers]
+
+    def validate(self):
+        if not super(TripForm, self).validate():
+            return False
+        # Validate start location
+        if not self.start_location.data and not (self.start_location_lat.data and self.start_location_lon.data):
+            self.start_location.errors.append("Please select a start location or provide valid coordinates.")
+            return False
+        # Validate end location
+        if not self.end_location.data and not (self.end_location_lat.data and self.end_location_lon.data):
+            self.end_location.errors.append("Please select an end location or provide valid coordinates.")
+            return False
+        return True
 
 class ClientRequestForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
@@ -256,6 +270,7 @@ def client_request():
                 drop_off_point=drop_off_coords,
                 comments=form.comments.data,
                 client_id=None,
+                estimated_cost=0.0,
                 pick_up_name=form.pick_up_point.data,
                 drop_off_name=form.drop_off_point.data
             )
@@ -264,7 +279,6 @@ def client_request():
             return render_template('confirmation.html', 
                                  request=client_request, 
                                  cost=client_request.estimated_cost,
-                                 cost_breakdown=client_request.cost_breakdown,
                                  client_name=client.name,
                                  active_page='client_request')
         except Exception as e:

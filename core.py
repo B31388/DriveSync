@@ -63,7 +63,7 @@ class DriveSyncApp:
         if not driver.vehicle:
             return "⚠️ Driver has no vehicle assigned"
 
-        trip = Trip(start, end, fuel_cost, driver.vehicle, driver)
+        trip = Trip(start, end, fuel_cost, driver.vehicle, driver, client_id=client_id)
         self.trips.append(trip)
 
         driver.assign_trip(trip)

@@ -110,7 +110,7 @@ class Client(Account):
         return "Client"
 
 class ClientRequest:
-    def __init__(self, name, email, contact, goods_description, pick_up_point, drop_off_point, comments, estimated_cost=0.0):
+    def __init__(self, name, email, contact, goods_description, pick_up_point, drop_off_point, comments, estimated_cost=0.0, client_id=None, pick_up_name=None, drop_off_name=None):
         self.name = name
         self.email = email
         self.contact = contact
@@ -119,6 +119,9 @@ class ClientRequest:
         self.drop_off_point = drop_off_point
         self.comments = comments
         self.estimated_cost = estimated_cost
+        self.client_id = client_id
+        self.pick_up_name = pick_up_name
+        self.drop_off_name = drop_off_name
 
     def get_details(self):
         return (
@@ -129,21 +132,28 @@ class ClientRequest:
         )
 
 class Trip:
-    def __init__(self, start_location, end_location, fuel_cost, vehicle: Vehicle, driver: Driver):
+    def __init__(self, start_location, end_location, fuel_cost, vehicle: Vehicle, driver: Driver, client_id=None):
         self.start_location = start_location
         self.end_location = end_location
         self.fuel_cost = fuel_cost
         self.vehicle = vehicle
         self.driver = driver
-
+        self.client_id = client_id
         self._distance = self.calculate_distance()
         self._total_cost = self.calculate_cost()
 
     def calculate_distance(self):
         try:
-            return geodesic(self.start_location, self.end_location).km
+            if not (isinstance(self.start_location, tuple) and isinstance(self.end_location, tuple)):
+                raise ValueError("Locations must be tuples of (latitude, longitude)")
+            if not all(isinstance(coord, (int, float)) for coord in self.start_location + self.end_location):
+                raise ValueError("Coordinates must be numeric")
+            distance = geodesic(self.start_location, self.end_location).km
+            if distance < 0:
+                raise ValueError("Calculated distance is negative")
+            return distance
         except Exception as e:
-            print("❌ Error calculating distance:", e)
+            print(f"❌ Error calculating distance: {e}")
             return 0
 
     def calculate_cost(self):
